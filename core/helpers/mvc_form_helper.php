@@ -368,10 +368,18 @@ class MvcFormHelper extends MvcHelper {
 
             jQuery(document).ready(function(){
 
+                var _selected = [];
+                jQuery("input[name=\''.$options['ids_input_name'].'[]'.'\']").each(
+                  function() {
+                    _selected.push(jQuery(this).val());
+                  }
+                );
+
                 jQuery("#'.$options['select_id'].'").change(function() {
                     var option = jQuery(this).find("option:selected");
                     var id = option.attr("value");
-                    if (id) {
+                    if (id && _selected.indexOf(id) == -1) {
+                        _selected.push(id);
                         var name = option.text();
                         var list_item = \'<li><input type="hidden" name="'.$options['ids_input_name'].'[]" value="\'+id+\'" />\'+name+\' <a href="#" class="remove-item">Remove</a></li>\';
                         jQuery("#'.$options['list_id'].'").append(list_item);
@@ -381,6 +389,8 @@ class MvcFormHelper extends MvcHelper {
                 });
 
                 jQuery(document).on("click", ".remove-item", function() {
+                    var i = jQuery(this).closest("li").find("input").val();
+                    _selected.splice(_selected.indexOf(i), 1);
                     jQuery(this).parents("li:first").remove();
                     return false;
                 });
